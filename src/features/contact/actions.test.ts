@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, it, expect, vi } from 'vitest';
 import { revalidatePath } from 'next/cache';
-import { saveInquiry } from './repository';
+import { saveInquiry } from '@/features/contact/repository';
 import { submitContact } from './actions';
 
 vi.mock('next/cache', () => ({

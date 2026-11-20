@@ -1,10 +1,11 @@
 'use client';
 
 import { useActionState, useId } from 'react';
-import type {
-  ContactErrors,
-  ContactInput,
-  ContactState,
+import {
+  inquiryType,
+  type ContactErrors,
+  type ContactInput,
+  type ContactState,
 } from './validateContact';
 
 type Props = {
@@ -26,7 +27,6 @@ export function ContactForm({ action }: Props) {
   const errors: ContactErrors = state.status === 'error' ? state.errors : {};
   const values: Partial<ContactInput> =
     state.status === 'error' ? state.values : {};
-
   return (
     <form action={formAction} noValidate>
       {errors.form && <p role="alert">{errors.form}</p>}
@@ -50,6 +50,16 @@ export function ContactForm({ action }: Props) {
         defaultValue={values.message}
         error={errors.message}
       />
+      <SelectField
+        key={values.inquiry ?? 'empty'}
+        name="inquiry"
+        label="お問い合わせの種類"
+        placeholder="選択してください"
+        defaultValue={values.inquiry}
+        options={inquiryType}
+        error={errors.inquiry}
+      />
+
       <button type="submit" disabled={isPending}>
         {isPending ? '送信中…' : '送信'}
       </button>
@@ -88,6 +98,50 @@ function Field({
     <div>
       <label htmlFor={id}>{label}</label>
       {multiline ? <textarea {...common} /> : <input type={type} {...common} />}
+      {error && <p id={errorId}>{error}</p>}
+    </div>
+  );
+}
+
+type SelectFieldProps = {
+  name: string;
+  label: string;
+  options: string[];
+  placeholder?: string;
+  defaultValue?: string;
+  error?: string;
+  disabled?: boolean;
+};
+
+export function SelectField({
+  name,
+  label,
+  options,
+  placeholder,
+  defaultValue,
+  error,
+  disabled,
+}: SelectFieldProps) {
+  const id = useId();
+  const errorId = `${id}-error`;
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <select
+        id={id}
+        name={name}
+        defaultValue={defaultValue}
+        disabled={disabled}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
       {error && <p id={errorId}>{error}</p>}
     </div>
   );

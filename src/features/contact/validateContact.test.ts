@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { validateContact, type ContactInput } from './validateContact';
+import {
+  validateContact,
+  type ContactInput,
+} from '@/features/contact/validateContact';
 
 const valid: ContactInput = {
   name: '山田太郎',

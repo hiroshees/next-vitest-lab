@@ -2,11 +2,14 @@ export type ContactInput = {
   name: string;
   email: string;
   message: string;
+  inquiry: string;
 };
 
 export type ContactErrors = Partial<
   Record<keyof ContactInput | 'form', string>
 >;
+
+export const inquiryType = ['商品について', '注文について', 'その他'];
 
 export type ContactState =
   | { status: 'idle' }
@@ -20,6 +23,7 @@ export function validateContact(input: ContactInput): ContactErrors {
   const name = input.name.trim();
   const email = input.email.trim();
   const message = input.message.trim();
+  const inquiry = input.inquiry.trim();
 
   if (!name) {
     errors.name = 'お名前を入力してください';
@@ -37,6 +41,12 @@ export function validateContact(input: ContactInput): ContactErrors {
     errors.message = 'お問い合わせ内容を入力してください';
   } else if (message.length > 1000) {
     errors.message = 'お問い合わせ内容は1000文字以内で入力してください';
+  }
+
+  if (!inquiry) {
+    errors.inquiry = 'お問い合わせ種類を入力してください';
+  } else if (!inquiryType.includes(inquiry)) {
+    errors.inquiry = 'お問い合わせ種類が間違えています';
   }
 
   return errors;

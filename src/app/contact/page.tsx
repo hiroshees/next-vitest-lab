@@ -1,6 +1,5 @@
 import { ContactForm } from '@/features/contact/ContactForm';
 import { submitContact } from '@/features/contact/actions';
-import { Suspense } from 'react';
 
 export default function ContactPage() {
   return (

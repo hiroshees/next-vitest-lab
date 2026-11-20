@@ -1,8 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { saveInquiry } from './repository';
-import { validateContact, type ContactState } from './validateContact';
+import { saveInquiry } from '@/features/contact/repository';
+import {
+  validateContact,
+  type ContactState,
+} from '@/features/contact/validateContact';
 
 export async function submitContact(
   _prevState: ContactState,
@@ -12,6 +15,7 @@ export async function submitContact(
     name: String(formData.get('name') ?? ''),
     email: String(formData.get('email') ?? ''),
     message: String(formData.get('message') ?? ''),
+    inquiry: String(formData.get('inquiry') ?? ''),
   };
 
   const errors = validateContact(values);
@@ -24,6 +28,7 @@ export async function submitContact(
       name: values.name.trim(),
       email: values.email.trim(),
       message: values.message.trim(),
+      inquiry: values.inquiry.trim(),
     });
   } catch {
     return {
