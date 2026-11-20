@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { http, HttpResponse, delay } from 'msw';
 import { API_BASE, type Weather } from '../../api/weather';
 import { WeatherCard } from './WeatherCard';

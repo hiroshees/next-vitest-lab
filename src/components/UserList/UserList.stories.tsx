@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { http, HttpResponse, delay } from 'msw';
 import { expect } from 'storybook/test';
 import { API_BASE } from '../../api/users';
