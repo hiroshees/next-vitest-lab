@@ -2,11 +2,11 @@
 
 import { useActionState, useId } from 'react';
 import {
-  inquiryType,
+  INQUIRY_TYPES,
   type ContactErrors,
   type ContactInput,
   type ContactState,
-} from './validateContact';
+} from '@/features/contact/validateContact';
 
 type Props = {
   action: (
@@ -50,13 +50,15 @@ export function ContactForm({ action }: Props) {
         defaultValue={values.message}
         error={errors.message}
       />
+      {/* React 19 の form action 後のリセットで select の選択が初期値に戻るのを防ぐため、
+    値が変わったら作り直す */}
       <SelectField
         key={values.inquiry ?? 'empty'}
         name="inquiry"
         label="お問い合わせの種類"
         placeholder="選択してください"
         defaultValue={values.inquiry}
-        options={inquiryType}
+        options={[...INQUIRY_TYPES]}
         error={errors.inquiry}
       />
 

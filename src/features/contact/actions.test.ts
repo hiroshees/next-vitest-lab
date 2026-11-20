@@ -8,7 +8,7 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }));
 
-vi.mock('./repository', () => ({
+vi.mock('@/features/contact/repository', () => ({
   saveInquiry: vi.fn(),
 }));
 
@@ -24,6 +24,7 @@ const validValues = {
   name: '  山田太郎  ',
   email: 'yamada@example.com',
   message: '商品について質問があります。',
+  inquiry: ' 商品について ',
 };
 
 describe('submitContact', () => {
@@ -38,6 +39,7 @@ describe('submitContact', () => {
       name: '山田太郎',
       email: 'yamada@example.com',
       message: '商品について質問があります。',
+      inquiry: '商品について',
     });
     expect(revalidatePath).toHaveBeenCalledWith('/admin/inquiries');
   });

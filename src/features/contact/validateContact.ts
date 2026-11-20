@@ -9,7 +9,12 @@ export type ContactErrors = Partial<
   Record<keyof ContactInput | 'form', string>
 >;
 
-export const inquiryType = ['商品について', '注文について', 'その他'];
+export const INQUIRY_TYPES = [
+  '商品について',
+  '注文について',
+  'その他',
+] as const;
+export type InquiryType = (typeof INQUIRY_TYPES)[number];
 
 export type ContactState =
   | { status: 'idle' }
@@ -45,7 +50,7 @@ export function validateContact(input: ContactInput): ContactErrors {
 
   if (!inquiry) {
     errors.inquiry = 'お問い合わせ種類を入力してください';
-  } else if (!inquiryType.includes(inquiry)) {
+  } else if (!(INQUIRY_TYPES as readonly string[]).includes(inquiry)) {
     errors.inquiry = 'お問い合わせ種類が間違えています';
   }
 
