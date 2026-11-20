@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { CityNotFoundError, getWeather, type Weather } from '../../api/weather';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { useId, type FormEvent } from 'react';
 import { useCharacterLimit } from '../../hooks/useCharacterLimit';
 

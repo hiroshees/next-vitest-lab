@@ -1,3 +1,5 @@
+'use client';
+
 import { useId, useState, type FormEvent } from 'react';
 
 type Props = {
