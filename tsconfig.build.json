@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "**/*.stories.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "src/test/**",
+    "src/mocks/**",
+    "vitest.config.mts"
+  ]
+}
