@@ -11,6 +11,7 @@
     "test:watch": "vitest watch",
     "test:unit": "vitest run --project unit",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -20,6 +21,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@storybook/addon-a11y": "^10.6.7",
     "@storybook/addon-docs": "^10.6.7",
     "@storybook/addon-vitest": "^10.6.7",
