@@ -12,6 +12,7 @@
     "test:unit": "vitest run --project unit",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:codegen": "playwright codegen http://localhost:3000/",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
