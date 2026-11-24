@@ -1,6 +1,10 @@
 import { ContactForm } from '@/features/contact/ContactForm';
 import { submitContact } from '@/features/contact/actions';
 
+export const metadata = {
+  title: 'お問い合わせ',
+};
+
 export default function ContactPage() {
   return (
     <main>

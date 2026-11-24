@@ -6,6 +6,10 @@ type Props = {
   searchParams: Promise<{ q?: string | string[] }>;
 };
 
+export const metadata = {
+  title: '商品一覧',
+};
+
 export default function ProductsPage({ searchParams }: Props) {
   return (
     <main>
