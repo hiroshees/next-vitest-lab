@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
+// import { test, expect } from '@playwright/test';
 import { ProductsPage } from './pages/ProductsPage';
+import { test, expect } from './fixtures';
 
 test.describe('商品一覧', () => {
   let productsPage: ProductsPage;
@@ -28,12 +29,19 @@ test.describe('商品一覧', () => {
     await expect(productsPage.productNames()).toHaveText(['黒いブーツ']);
   });
 
-  test('一致する商品がないと、その旨が表示される', async () => {
+  // test('一致する商品がないと、その旨が表示される', async () => {
+  //   await productsPage.goto();
+  //   await productsPage.search('帽子');
+
+  //   await expect(productsPage.noMatchMessage('帽子')).toBeVisible();
+  //   await expect(productsPage.productList).toBeHidden();
+  // });
+
+  test('一致する商品がないと、その旨が表示される', async ({ productsPage }) => {
     await productsPage.goto();
     await productsPage.search('帽子');
 
     await expect(productsPage.noMatchMessage('帽子')).toBeVisible();
-    await expect(productsPage.productList).toBeHidden();
   });
 
   test('検索したあとブラウザの「戻る」を押すと、検索前の状態に戻る', async ({
