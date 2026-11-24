@@ -13,18 +13,42 @@ test.describe('お問い合わせ', () => {
 
   test.beforeEach(async ({ page }) => {
     contactPage = new ContactPage(page);
+    await contactPage.goto();
   });
 
-  test('正しく入力して送信すると、受け付けた旨が表示される', async () => {
-    await contactPage.goto();
+  test('正しく入力して送信すると、受け付けた旨が表示される', async ({
+    page,
+  }, testInfo) => {
+    await test.step('お問い合わせ画面を開く', async () => {
+      await expect(contactPage.submitButton).toBeVisible();
+      await testInfo.attach('01_入力前', {
+        body: await page.screenshot(),
+        contentType: 'image/png',
+      });
+    });
 
-    await contactPage.fill(validContact);
-    await contactPage.submit();
+    await test.step('すべての項目を正しく入力する', async () => {
+      await contactPage.fill(validContact);
+      await testInfo.attach('02_入力後', {
+        body: await page.screenshot(),
+        contentType: 'image/png',
+      });
+    });
 
-    await expect(contactPage.successMessage).toHaveText(
-      'お問い合わせを受け付けました。',
-    );
-    await expect(contactPage.submitButton).toBeHidden();
+    await test.step('送信する', async () => {
+      await contactPage.submit();
+    });
+
+    await test.step('受け付けた旨が表示され、フォームが消える', async () => {
+      await expect(contactPage.successMessage).toHaveText(
+        'お問い合わせを受け付けました。',
+      );
+      await expect(contactPage.submitButton).toBeHidden();
+      await testInfo.attach('03_送信後', {
+        body: await page.screenshot(),
+        contentType: 'image/png',
+      });
+    });
   });
 
   test('メールアドレスの形式が誤っていると、エラーが表示され、入力した値は残る', async () => {
