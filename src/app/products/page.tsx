@@ -13,7 +13,7 @@ export const metadata = {
 export default function ProductsPage({ searchParams }: Props) {
   return (
     <main>
-      <h1>商品一覧</h1>
+      <h1 className="text-3xl font-bold">商品一覧</h1>
       <Suspense>
         <ProductSearch />
       </Suspense>

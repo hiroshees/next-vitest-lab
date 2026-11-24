@@ -14,6 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:evidence": "EVIDENCE=1 playwright test",
     "test:e2e:codegen": "playwright codegen http://localhost:3000/",
+    "test:visual": "pnpm build && CI=1 playwright test e2e/visual.spec.ts",
+    "test:visual:update": "pnpm build && CI=1 playwright test e2e/visual.spec.ts --update-snapshots",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
