@@ -31,11 +31,17 @@ function setup({ pathname = '/products', query = '' } = {}) {
   );
 
   const user = userEvent.setup();
-  render(<ProductSearch />);
+  const { rerender } = render(<ProductSearch />);
   const input = screen.getByRole('searchbox', { name: '商品を検索' });
   const button = screen.getByRole('button', { name: '検索' });
 
-  return { user, push, input, button };
+  return {
+    user,
+    push,
+    input,
+    button,
+    rerenderProductSearch: () => rerender(<ProductSearch />),
+  };
 }
 
 describe('ProductSearch', () => {
@@ -85,6 +91,23 @@ describe('ProductSearch', () => {
 
     expect(push).toHaveBeenCalledWith(
       `/products?${new URLSearchParams({ q: 'スニーカー' })}`,
+    );
+  });
+
+  it('表示したあとで URL の q が変わると（戻るなど）、入力欄もその値になる', () => {
+    const { rerenderProductSearch } = setup({ query: 'q=sneaker' });
+    expect(screen.getByRole('searchbox', { name: '商品を検索' })).toHaveValue(
+      'sneaker',
+    );
+
+    // URL が変わった（戻るボタンを押した）状況を作る
+    vi.mocked(useSearchParams).mockReturnValue(
+      new URLSearchParams('') as unknown as ReadonlyURLSearchParams,
+    );
+    rerenderProductSearch();
+
+    expect(screen.getByRole('searchbox', { name: '商品を検索' })).toHaveValue(
+      '',
     );
   });
 });
