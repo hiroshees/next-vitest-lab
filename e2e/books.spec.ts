@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { BookFormPage } from './pages/BookFormPage';
 import { BooksPage } from './pages/BooksPage';
 
 // データはサーバーに1つしかないので、このファイルのテストは順番に実行する
@@ -53,5 +54,82 @@ test.describe('SCR-01 書籍一覧', () => {
       'href',
       '/books/3/edit',
     );
+  });
+});
+
+test.describe('SCR-02 書籍の新規登録', () => {
+  test('BOOK-L05 BOOK-N01 一覧から登録画面へ移動し、登録すると一覧の先頭に表示される', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    const form = new BookFormPage(page);
+
+    await books.goto();
+    await books.newLink.click();
+
+    await expect(page).toHaveURL(/\/books\/new$/);
+    await expect(form.heading).toHaveText('書籍の新規登録');
+
+    await form.fill({
+      title: '  テスト駆動入門  ',
+      author: '高橋次郎',
+      genre: '技術書',
+      publishedYear: '2020',
+      memo: 'E2Eで登録',
+    });
+    await form.submitButton('登録する').click();
+
+    await expect(page).toHaveURL(/\/books\?message=created$/);
+    await expect(books.flash).toHaveText('登録しました');
+    await expect(books.count).toHaveText('全4件');
+    // 前後の空白は取り除かれて保存される
+    await expect(books.titleCells().first()).toHaveText('テスト駆動入門');
+    await expect(books.row('テスト駆動入門')).toContainText('高橋次郎');
+  });
+
+  test('BOOK-N02 NGなら、エラーが表示され、入力した値が残り、登録されない', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    const form = new BookFormPage(page);
+    await form.gotoNew();
+
+    await form.fill({
+      title: 'テスト駆動入門',
+      genre: '技術書',
+      publishedYear: '2020.5',
+    });
+    await form.submitButton('登録する').click();
+
+    await expect(form.author).toHaveAccessibleDescription(
+      '著者を入力してください',
+    );
+    await expect(form.publishedYear).toHaveAccessibleDescription(
+      '出版年は整数で入力してください',
+    );
+    await expect(form.title).not.toHaveAttribute('aria-invalid');
+
+    await expect(page).toHaveURL(/\/books\/new$/);
+    await expect(form.title).toHaveValue('テスト駆動入門');
+    await expect(form.genre).toHaveValue('技術書');
+    await expect(form.publishedYear).toHaveValue('2020.5');
+
+    await books.goto();
+    await expect(books.count).toHaveText('全3件');
+  });
+
+  test('BOOK-N05 キャンセルすると一覧に戻り、何も登録されない', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    const form = new BookFormPage(page);
+    await form.gotoNew();
+
+    await form.fill({ title: '登録しない本' });
+    await form.cancelLink.click();
+
+    await expect(page).toHaveURL(/\/books$/);
+    await expect(books.count).toHaveText('全3件');
+    await expect(books.row('登録しない本')).toHaveCount(0);
   });
 });

@@ -116,6 +116,9 @@ export function BookForm({
       <Field label="ジャンル" error={errors.genre}>
         {(a11y) => (
           <select
+            // React 19 は送信後に項目を初期値へ戻すが、select は最初の defaultValue しか使わない。
+            // 値が変わったら作り直して、新しい値を初期値にする
+            key={values.genre}
             {...a11y}
             name="genre"
             defaultValue={values.genre}
