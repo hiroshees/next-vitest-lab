@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -141,8 +141,8 @@ describe('BookForm', () => {
 
   it('BOOK-N04 送信中はボタンが押せない', async () => {
     const user = userEvent.setup();
-    // 終わらない処理にして、送信中の状態を作る
-    const action = vi.fn<Action>(() => new Promise(() => {}));
+    const { promise, resolve } = Promise.withResolvers<BookFormState>();
+    const action = vi.fn<Action>(() => promise);
     render(<BookForm action={action} submitLabel="登録する" />);
 
     await user.click(screen.getByRole('button', { name: '登録する' }));
@@ -150,5 +150,10 @@ describe('BookForm', () => {
     expect(
       await screen.findByRole('button', { name: '登録する' }),
     ).toBeDisabled();
+
+    // 後片付け：終わらない処理を残すと、同じファイルの次のテストに影響する
+    await act(async () => {
+      resolve({ status: 'idle' });
+    });
   });
 });

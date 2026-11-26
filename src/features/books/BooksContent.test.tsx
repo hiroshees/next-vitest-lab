@@ -5,6 +5,8 @@ import { BooksContent } from './BooksContent';
 import { listBooks } from './repository';
 
 vi.mock('./repository', () => ({ listBooks: vi.fn() }));
+vi.mock('./actions', () => ({ deleteBookAction: vi.fn() }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: vi.fn() }) }));
 
 async function renderContent(params: { message?: string | string[] } = {}) {
   // 非同期の Server Component は、関数として呼んで結果を render する

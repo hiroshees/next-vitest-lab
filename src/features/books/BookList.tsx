@@ -42,12 +42,16 @@ export function BookList({ books, deleteAction }: Props) {
 
     startTransition(async () => {
       const result = await deleteAction(id);
-      if (result.ok) {
-        setTarget(null);
-        router.replace('/books?message=deleted');
-      } else {
-        setError(result.message);
-      }
+      // await のあとの state 更新はトランジションの外になるので、もう一度包む。
+      // これで「結果の反映」と「isPending が false になる」が同時に画面に出る
+      startTransition(() => {
+        if (result.ok) {
+          setTarget(null);
+          router.replace('/books?message=deleted');
+        } else {
+          setError(result.message);
+        }
+      });
     });
   }
 

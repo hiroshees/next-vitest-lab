@@ -204,3 +204,108 @@ test.describe('SCR-03 書籍の編集', () => {
     );
   });
 });
+
+test.describe('SCR-01 削除（確認モーダル）', () => {
+  test('BOOK-D01 BOOK-D02 BOOK-D07 「いいえ」なら閉じて何もせず、フォーカスが戻る', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    await books.goto();
+
+    await books.deleteButton('チームで進める仕事術').click();
+
+    await expect(books.dialog).toBeVisible();
+    await expect(books.dialog).toContainText(
+      '『チームで進める仕事術』を削除しますか？',
+    );
+    await expect(books.noButton).toBeFocused();
+
+    await books.noButton.click();
+
+    await expect(books.dialog).toBeHidden();
+    await expect(books.deleteButton('チームで進める仕事術')).toBeFocused();
+    await expect(books.count).toHaveText('全3件');
+  });
+
+  test('BOOK-D03 Esc や背景のクリックでも、閉じて何もしない', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    await books.goto();
+
+    await books.deleteButton('配色の基本').click();
+    await expect(books.dialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(books.dialog).toBeHidden();
+    await expect(books.deleteButton('配色の基本')).toBeFocused();
+
+    await books.deleteButton('配色の基本').click();
+    await expect(books.dialog).toBeVisible();
+    await books.clickBackdrop();
+    await expect(books.dialog).toBeHidden();
+
+    await expect(books.count).toHaveText('全3件');
+  });
+
+  test('BOOK-D04 BOOK-D05 「はい」で削除され、一覧から消えて「削除しました」が表示される', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    await books.goto();
+
+    await books.deleteButton('チームで進める仕事術').click();
+    await books.yesButton.click();
+
+    await expect(page).toHaveURL(/\/books\?message=deleted$/);
+    await expect(books.dialog).toBeHidden();
+    await expect(books.flash).toHaveText('削除しました');
+    await expect(books.count).toHaveText('全2件');
+    await expect(books.titleCells()).toHaveText([
+      'はじめてのTypeScript',
+      '配色の基本',
+    ]);
+  });
+
+  test('BOOK-D08 モーダルを開いている間にほかの人が削除したら、メッセージを表示する', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    await books.goto();
+    await books.deleteButton('チームで進める仕事術').click();
+
+    // 別のタブで、同じ書籍を先に削除する
+    const other = new BooksPage(await page.context().newPage());
+    await other.goto();
+    await other.deleteButton('チームで進める仕事術').click();
+    await other.yesButton.click();
+    await expect(other.flash).toHaveText('削除しました');
+
+    // 元のタブで「はい」を押す
+    await books.yesButton.click();
+
+    await expect(books.dialog.getByRole('alert')).toHaveText(
+      '対象の書籍が見つかりません',
+    );
+    await expect(books.dialog).toBeVisible();
+  });
+
+  test('BOOK-E04 編集している間にほかの人が削除したら、更新時にメッセージを表示する', async ({
+    page,
+  }) => {
+    const form = new BookFormPage(page);
+    await form.gotoEdit('2');
+
+    // 別のタブで、編集中の書籍を削除する
+    const other = new BooksPage(await page.context().newPage());
+    await other.goto();
+    await other.deleteButton('チームで進める仕事術').click();
+    await other.yesButton.click();
+    await expect(other.flash).toHaveText('削除しました');
+
+    // 元のタブで「更新する」を押す
+    await form.submitButton('更新する').click();
+
+    await expect(form.formError).toHaveText('対象の書籍が見つかりません');
+    await expect(page).toHaveURL(/\/books\/2\/edit$/);
+  });
+});

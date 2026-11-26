@@ -2,8 +2,13 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { describe, expect, it, vi } from 'vitest';
-import { createBookAction, updateBookAction } from './actions';
-import { insertBook, updateBook } from './repository';
+import {
+  createBookAction,
+  deleteBookAction,
+  updateBookAction,
+} from './actions';
+import { deleteBook, insertBook, updateBook } from './repository';
+
 import type { BookFormState, BookFormValues } from './validateBook';
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
@@ -12,7 +17,11 @@ vi.mock('next/navigation', () => ({
     throw new Error('NEXT_REDIRECT');
   }),
 }));
-vi.mock('./repository', () => ({ insertBook: vi.fn(), updateBook: vi.fn() })); // ← updateBook を追加
+vi.mock('./repository', () => ({
+  insertBook: vi.fn(),
+  updateBook: vi.fn(),
+  deleteBook: vi.fn(),
+}));
 
 const idle: BookFormState = { status: 'idle' };
 
@@ -123,5 +132,30 @@ describe('updateBookAction', () => {
     });
     expect(revalidatePath).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
+  });
+});
+
+describe('deleteBookAction', () => {
+  it('BOOK-D04 削除できたら一覧を更新し、ok を返す（移動はしない）', async () => {
+    vi.mocked(deleteBook).mockReturnValue(true);
+
+    const result = await deleteBookAction('2');
+
+    expect(result).toEqual({ ok: true });
+    expect(deleteBook).toHaveBeenCalledWith('2');
+    expect(revalidatePath).toHaveBeenCalledWith('/books');
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('BOOK-D08 対象がなければ「対象の書籍が見つかりません」を返す', async () => {
+    vi.mocked(deleteBook).mockReturnValue(false);
+
+    const result = await deleteBookAction('999');
+
+    expect(result).toEqual({
+      ok: false,
+      message: '対象の書籍が見つかりません',
+    });
+    expect(revalidatePath).not.toHaveBeenCalled();
   });
 });
