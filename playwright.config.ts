@@ -17,5 +17,6 @@ export default defineConfig({
     command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
+    env: { E2E: '1' }, // ← 追加：テスト用リセットAPIを有効にする
   },
 });
