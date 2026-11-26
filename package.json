@@ -11,6 +11,7 @@
     "test:watch": "vitest watch",
     "test:unit": "vitest run --project unit",
     "test:coverage": "vitest run --coverage",
+    "test:storybook": "vitest run --project storybook",
     "test:e2e": "playwright test",
     "test:e2e:evidence": "EVIDENCE=1 playwright test",
     "test:e2e:codegen": "playwright codegen http://localhost:3000/",
