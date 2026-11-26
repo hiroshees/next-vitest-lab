@@ -99,3 +99,34 @@ export const Submitting: Story = {
     ).toBeDisabled();
   },
 };
+
+/** BOOK-E04 更新しようとしたら、対象の書籍が削除されていたとき */
+export const EditNotFound: Story = {
+  args: {
+    ...Edit.args,
+    action: fn(
+      async (): Promise<BookFormState> => ({
+        status: 'error',
+        errors: { form: '対象の書籍が見つかりません' },
+        values: {
+          title: 'チームで進める仕事術',
+          author: '佐藤花子',
+          genre: 'ビジネス',
+          publishedYear: '2021',
+          memo: '読書会で使用',
+        },
+      }),
+    ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '更新する' }));
+
+    await expect(await canvas.findByRole('alert')).toHaveTextContent(
+      '対象の書籍が見つかりません',
+    );
+    // 入力していた値は残る
+    await expect(canvas.getByRole('textbox', { name: 'タイトル' })).toHaveValue(
+      'チームで進める仕事術',
+    );
+  },
+};

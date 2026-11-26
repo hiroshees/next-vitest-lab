@@ -133,3 +133,74 @@ test.describe('SCR-02 書籍の新規登録', () => {
     await expect(books.row('登録しない本')).toHaveCount(0);
   });
 });
+
+test.describe('SCR-03 書籍の編集', () => {
+  test('BOOK-L05 BOOK-E01 BOOK-E02 一覧から編集画面へ移動し、更新すると一覧に反映される', async ({
+    page,
+  }) => {
+    const books = new BooksPage(page);
+    const form = new BookFormPage(page);
+
+    await books.goto();
+    await books.editLink('チームで進める仕事術').click();
+
+    await expect(page).toHaveURL(/\/books\/2\/edit$/);
+    await expect(form.heading).toHaveText('書籍の編集');
+
+    // 登録済みの値が入っている
+    await expect(form.title).toHaveValue('チームで進める仕事術');
+    await expect(form.author).toHaveValue('佐藤花子');
+    await expect(form.genre).toHaveValue('ビジネス');
+    await expect(form.publishedYear).toHaveValue('2021');
+    await expect(form.memo).toHaveValue('読書会で使用');
+
+    await form.fill({ title: 'チームで進める仕事術 改訂版', genre: 'その他' });
+    await form.submitButton('更新する').click();
+
+    await expect(page).toHaveURL(/\/books\?message=updated$/);
+    await expect(books.flash).toHaveText('更新しました');
+    await expect(books.count).toHaveText('全3件');
+    // 更新しても並び順（新しい順＝idの順）は変わらない
+    await expect(books.titleCells()).toHaveText([
+      'はじめてのTypeScript',
+      'チームで進める仕事術 改訂版',
+      '配色の基本',
+    ]);
+    await expect(books.row('チームで進める仕事術 改訂版')).toContainText(
+      'その他',
+    );
+  });
+
+  test('BOOK-E03 NGなら、エラーが表示され、更新されない', async ({ page }) => {
+    const books = new BooksPage(page);
+    const form = new BookFormPage(page);
+    await form.gotoEdit('2');
+
+    await form.fill({ title: '', publishedYear: '1899' });
+    await form.submitButton('更新する').click();
+
+    await expect(form.title).toHaveAccessibleDescription(
+      'タイトルを入力してください',
+    );
+    await expect(form.publishedYear).toHaveAccessibleDescription(
+      '出版年は1900年から今年までで入力してください',
+    );
+    await expect(page).toHaveURL(/\/books\/2\/edit$/);
+    // エラーでない項目の値は残っている
+    await expect(form.author).toHaveValue('佐藤花子');
+    await expect(form.genre).toHaveValue('ビジネス');
+
+    await books.goto();
+    await expect(books.row('チームで進める仕事術')).toContainText('2021');
+  });
+
+  test('BOOK-E04 存在しない id の編集画面は404画面になる', async ({ page }) => {
+    await page.goto('/books/999/edit');
+
+    // Suspense の中で notFound() を呼ぶと、ステータスコードは200のことがあるので、表示で確かめる
+    await expect(page.getByText('This page could not be found.')).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'タイトル' })).toHaveCount(
+      0,
+    );
+  });
+});
