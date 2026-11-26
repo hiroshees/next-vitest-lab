@@ -2,12 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { insertBook, updateBook } from './repository';
+import { deleteBook, insertBook, updateBook } from './repository';
 import {
   type BookFormState,
   toBookFormValues,
   validateBook,
 } from './validateBook';
+
+export type DeleteBookResult = { ok: true } | { ok: false; message: string };
 
 export async function createBookAction(
   _prevState: BookFormState,
@@ -56,4 +58,16 @@ export async function updateBookAction(
 
   revalidatePath('/books');
   redirect('/books?message=updated');
+}
+
+/**
+ * 削除は一覧画面にいたまま呼ばれるので、redirect せずに結果を返す。
+ * 画面側（BookList）でモーダルを閉じてから、一覧へ移動する。
+ */
+export async function deleteBookAction(id: string): Promise<DeleteBookResult> {
+  if (!deleteBook(id)) {
+    return { ok: false, message: '対象の書籍が見つかりません' };
+  }
+  revalidatePath('/books');
+  return { ok: true };
 }

@@ -1,6 +1,7 @@
 import { BookList } from './BookList';
 import { FlashMessage } from './FlashMessage';
 import { listBooks } from './repository';
+import { deleteBookAction } from './actions';
 
 type Props = {
   searchParams: Promise<{ message?: string | string[] }>;
@@ -33,7 +34,7 @@ export async function BooksContent({ searchParams }: Props) {
           書籍が登録されていません
         </p>
       ) : (
-        <BookList books={books} />
+        <BookList books={books} deleteAction={deleteBookAction} />
       )}
     </div>
   );
